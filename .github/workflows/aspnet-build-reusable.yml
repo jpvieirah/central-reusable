@@ -15,10 +15,9 @@ on:
         description: 'The .NET version to use'
         required: true
         type: string
-    #secrets:
-      # Se precisar de tokens para autenticação em outros serviços, adicione-os aqui
-      # SONAR_TOKEN:
-      #   required: true
+    secrets:
+      SONAR_TOKEN:
+        required: true
 
 jobs:
   build:
