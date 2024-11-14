@@ -37,22 +37,22 @@ jobs:
 
       - name: Restore dependencies
         run: |
-          cd aspnet-pipelines/aspnet-pipelines  # Caminho para a pasta do projeto
+          cd aspnet-pipelines/aspnet-pipelines  # Caminho correto para o diretório onde o projeto .csproj está localizado
           dotnet restore
 
       - name: Build project
         run: |
-          cd aspnet-pipelines/aspnet-pipelines  # Caminho para a pasta do projeto
+          cd aspnet-pipelines/aspnet-pipelines  # Caminho correto para o diretório onde o projeto .csproj está localizado
           dotnet build --configuration Release
 
       - name: Run unit tests
         run: |
-          cd aspnet-pipelines/aspnet-pipelines  # Caminho para a pasta do projeto
+          cd aspnet-pipelines/aspnet-pipelines  # Caminho correto para o diretório onde o projeto .csproj está localizado
           dotnet test --configuration Release
 
       - name: Publish project
         run: |
-          cd aspnet-pipelines/aspnet-pipelines  # Caminho para a pasta do projeto
+          cd aspnet-pipelines/aspnet-pipelines  # Caminho correto para o diretório onde o projeto .csproj está localizado
           dotnet publish --configuration Release --output ./publish
 
       - name: Upload artifacts
