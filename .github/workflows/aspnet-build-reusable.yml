@@ -15,10 +15,7 @@ on:
         description: 'The .NET version to use'
         required: true
         type: string
-    #secrets:
-      # Se precisar de tokens para autenticação em outros serviços, adicione-os aqui
-      # SONAR_TOKEN:
-      #   required: true
+    # Não é necessário definir 'secrets' aqui no arquivo reutilizável
 
 jobs:
   build:
@@ -55,6 +52,22 @@ jobs:
           cd aspnet-pipelines
           dotnet publish --configuration Release --output ./publish
 
+      # Instalar o scanner SonarCloud
+      - name: Install SonarCloud scanner
+        run: |
+          dotnet tool install --global dotnet-sonarscanner
+
+      # Iniciar a análise no SonarCloud
+      - name: Run SonarCloud analysis
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Para acessar informações do PR
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Token para autenticação com o SonarCloud
+        run: |
+          cd aspnet-pipelines
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"jpvieirah_aspnet-pipelines" /o:"jpvieirah" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
+          dotnet build
+          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+
       # Listar conteúdo da pasta de publicação para depuração
       - name: List publish directory contents
         run: |
@@ -62,16 +75,10 @@ jobs:
           echo "Listing contents of the publish directory:"
           dir ./publish
 
-      # Se o diretório acima não funcionar, verifique outros caminhos possíveis
-      - name: List bin/Release directory contents
-        run: |
-          cd aspnet-pipelines
-          echo "Listing contents of the bin/Release directory:"
-          dir ./bin/Release
-
+      # Upload artifacts
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: aspnet-build
-          path: aspnet-pipelines/publish  # Verifique se a pasta foi gerada e o caminho está correto
+          path: aspnet-pipelines/publish
           if-no-files-found: warn
