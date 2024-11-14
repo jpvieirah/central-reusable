@@ -55,8 +55,23 @@ jobs:
           cd aspnet-pipelines
           dotnet publish --configuration Release --output ./publish
 
+      # Listar conteúdo da pasta de publicação para depuração
+      - name: List publish directory contents
+        run: |
+          cd aspnet-pipelines
+          echo "Listing contents of the publish directory:"
+          dir ./publish
+
+      # Se o diretório acima não funcionar, verifique outros caminhos possíveis
+      - name: List bin/Release directory contents
+        run: |
+          cd aspnet-pipelines
+          echo "Listing contents of the bin/Release directory:"
+          dir ./bin/Release
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: aspnet-build
-          path: aspnet-pipelines/bin/Release/net7.0/publish
+          path: aspnet-pipelines/publish  # Verifique se a pasta foi gerada e o caminho está correto
+          if-no-files-found: warn
