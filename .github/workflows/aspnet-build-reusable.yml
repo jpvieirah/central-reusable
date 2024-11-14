@@ -1,0 +1,73 @@
+name: Build Reusable Workflow
+
+on:
+  workflow_call:
+    inputs:
+      language:
+        description: 'Programming language for the build'
+        required: true
+        type: string
+      environment:
+        description: 'Deployment environment'
+        required: true
+        type: string
+    #secrets:
+      # Se precisar de tokens para autenticação em outros serviços, adicione-os aqui
+      # SONAR_TOKEN:
+      #   required: true
+
+jobs:
+  build:
+    runs-on: windows-latest  # Agora o ambiente é Windows
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Faz o checkout completo, incluindo todos os commits
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0'  # Defina a versão do .NET que você está usando
+
+      - name: Restore dependencies
+        run: |
+          cd aspnet-pipelines  # Ajuste o caminho para a pasta onde está o seu projeto
+          dotnet restore
+
+      - name: Build project
+        run: |
+          cd aspnet-pipelines  # Ajuste o caminho para a pasta onde está o seu projeto
+          dotnet build --configuration Release
+
+      - name: Run unit tests
+        run: |
+          cd aspnet-pipelines  # Ajuste o caminho para a pasta onde está o seu projeto
+          dotnet test --configuration Release
+
+      # Se for usar o SonarQube, descomente a seção abaixo
+      # - name: Run SonarQube scan
+      #   uses: SonarSource/sonarcloud-github-action@v2
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #   with:
+      #     args: >
+      #       -Dsonar.projectKey=jpvieirah_aspnet-pipelines
+      #       -Dsonar.organization=jpvieirah
+      #       -Dsonar.host.url=https://sonarcloud.io
+      #       -Dsonar.sources=aspnet-pipelines/src
+      #       -Dsonar.dotnet.reporters=SonarAnalyzer.CSharp
+
+      - name: Publish project
+        run: |
+          cd aspnet-pipelines  # Ajuste o caminho para a pasta onde está o seu projeto
+          dotnet publish --configuration Release --output ./publish
+
+      # Se precisar fazer o deploy ou upload de artefatos, adicione os steps aqui
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: aspnet-build
+          path: aspnet-pipelines/bin/Release/net7.0/publish  # Ajuste conforme o caminho do seu build
