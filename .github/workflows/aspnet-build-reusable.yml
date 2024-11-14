@@ -60,11 +60,7 @@ jobs:
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"jpvieirah_aspnet-pipelines" /o:"jpvieirah" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.scanner.scanAll=false
           cd aspnet-pipelines
           dotnet build
-          echo "aqui é o diretório"
-          Get-Location
-          echo "aqui é o conteúdo" 
-          Get-ChildItem
-          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+         # .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
       - name: Checkout code
         uses: actions/checkout@v3
         with:
